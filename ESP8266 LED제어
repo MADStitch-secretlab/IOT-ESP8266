@@ -1,0 +1,44 @@
+#include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
+
+ESP8266WebServer server(80);
+
+int led = D4;
+
+void setup()
+{
+  pinMode(led, OUTPUT);
+  digitalWrite(led, HIGH);
+  
+  Serial.begin(115200);
+  Serial.println();
+
+  WiFi.begin("AP-101-2302", "1574?5e6");
+
+  Serial.print("Connecting");
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println();
+
+  Serial.print("Connected, IP address: ");
+  Serial.println(WiFi.localIP());
+
+  server.on("/", handleRoot);
+
+  server.begin();
+  Serial.println("HTTP server started");
+}
+
+void handleRoot(){
+  digitalWrite(led, LOW);
+  delay(1000);
+  server.send(200, "text/plain", "hello from esp8266!");
+  digitalWrite(led, HIGH);
+  
+}
+
+void loop() {
+  server.handleClient();}
